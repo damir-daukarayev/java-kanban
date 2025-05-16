@@ -1,5 +1,7 @@
 package modelling;
 
+import manager.TaskManager;
+
 import java.util.Objects;
 
 public class Task {
@@ -8,10 +10,15 @@ public class Task {
     protected int id;
     protected TaskStatus taskStatus;
 
-    public Task(String name, String description, int id, TaskStatus taskStatus) {
+    public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        this.id = id;
+        this.taskStatus = TaskStatus.NEW;
+    }
+
+    public Task(String name, String description, TaskStatus taskStatus) {
+        this.name = name;
+        this.description = description;
         this.taskStatus = taskStatus;
     }
 

@@ -9,21 +9,21 @@ public class Main {
         TaskManager manager = new TaskManager();
 
         // 1. Создание двух задач
-        Task task1 = manager.createTask("Task 1", "Description of Task 1");
-        Task task2 = manager.createTask("Task 2", "Description of Task 2");
+        Task task1 = manager.createTask(new Task("Task 1", "Description of Task 1"));
+        Task task2 = manager.createTask(new Task("Task 2", "Description of Task 2"));
 
         // 2. Создание эпика с двумя подзадачами
-        Epic epic1 = manager.createEpic("Epic 1", "Description of Epic 1");
-        Subtask subtask1 = manager.createSubtask("Subtask 1.1", "Description 1.1", TaskStatus.NEW, epic1.getId());
-        Subtask subtask2 = manager.createSubtask("Subtask 1.2", "Description 1.2", TaskStatus.NEW, epic1.getId());
+        Epic epic1 = manager.createEpic(new Epic("Epic 1", "Description of Epic 1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask 1.1", "Description 1.1", TaskStatus.NEW, epic1.getId()));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask 1.2", "Description 1.2", TaskStatus.NEW, epic1.getId()));
 
         // Добавление ID подзадач в эпик
         epic1.addSubtaskId(subtask1.getId());
         epic1.addSubtaskId(subtask2.getId());
 
         // 3. Эпик с одной подзадачей
-        Epic epic2 = manager.createEpic("Epic 2", "Description of Epic 2");
-        Subtask subtask3 = manager.createSubtask("Subtask 2.1", "Description 2.1", TaskStatus.NEW, epic2.getId());
+        Epic epic2 = manager.createEpic(new Epic("Epic 2", "Description of Epic 2"));
+        Subtask subtask3 = manager.createSubtask(new Subtask("Subtask 2.1", "Description 2.1", TaskStatus.NEW, epic2.getId()));
         epic2.addSubtaskId(subtask3.getId());
 
         // 4. Распечатка всех задач, эпиков и подзадач

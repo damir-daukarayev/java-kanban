@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskManager {
-    private int taskId = 0;
-    private int epicId = 0;
-    private int subTaskId = 0;
+    private static int id = 0;
     protected HashMap<Integer, Task> mapOfTasks = new HashMap<>();
     protected HashMap<Integer, Epic> mapOfEpics = new HashMap<>();
     protected HashMap<Integer, Subtask> mapOfSubtasks = new HashMap<>();
@@ -32,59 +30,29 @@ public class TaskManager {
         mapOfTasks.clear();
         System.out.println("All of the tasks were deleted");
         System.out.println("=".repeat(50));
-        taskId = 0;
     }
 
     //Получение по идентификатору.
     public Task getTask(int id) {
-        if (mapOfTasks.containsKey(id)) {
-            return mapOfTasks.get(id);
-        }
-        return null;
+        return mapOfTasks.get(id);
     }
 
     public Task createTask(Task task) {
-        int generatedId = generateTaskId();
-        mapOfTasks.put(generatedId, new Task(task.getName(), task.getDescription(), generatedId, TaskStatus.NEW));
-        System.out.println("Task[" + generatedId + "] created");
-        return task;
-    }
-
-    public Task createTask(String name, String description) {
-        int generatedId = generateTaskId();
-        Task task = new Task(name, description, generatedId, TaskStatus.NEW);
-        mapOfTasks.put(generatedId, task);
-        System.out.println("Task[" + generatedId + "] created");
-        return task;
-    }
-
-    public Task createTask(String name, String description, TaskStatus taskStatus) {
-        int generatedId = generateTaskId();
-        Task task = new Task(name, description, generatedId, taskStatus);
-        mapOfTasks.put(generatedId, task);
-        System.out.println("Task[" + generatedId + "] created");
+        //by default all the new tasks have a NEW status
+        task.setId(generateId());
+        mapOfTasks.put(task.getId(), task);
+        System.out.println("Task[" + task.getId() + "] created");
         return task;
     }
 
     //Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
-    public Task updateTask(int i, Task updatedTask) {
-        mapOfTasks.put(i, updatedTask);
-        return updatedTask;
-    }
-
-    public Task updateTaskName(int id, String name) {
-        mapOfTasks.get(id).setName(name);
-        return mapOfTasks.get(id);
-    }
-
-    public Task updateTaskDescription(int id, String description) {
-        mapOfTasks.get(id).setDescription(description);
-        return mapOfTasks.get(id);
-    }
-
-    public Task updateTaskStatus(int id, TaskStatus taskStatus) {
-        mapOfTasks.get(id).setTaskStatus(taskStatus);
-        return mapOfTasks.get(id);
+    public boolean updateTask(int id, Task updatedTask) {
+        if (mapOfTasks.containsKey(id)) {
+            mapOfTasks.put(id, updatedTask);
+        } else {
+            System.out.println("There is no such task with such id.");
+        }
+        return false;
     }
 
     //Удаление по идентификатору.
@@ -94,10 +62,6 @@ public class TaskManager {
         } else {
             System.out.println("Such a task with such id does not exist.");
         }
-    }
-
-    public int generateTaskId() {
-        return this.taskId++;
     }
 
     //Epic methods
@@ -115,63 +79,40 @@ public class TaskManager {
     //Удаление всех задач.
     //deleting an epic also triggers deleting its subtasks
     public void clearAllEpics() {
-        for (Epic epic : mapOfEpics.values()) {
-            for (int index : epic.getSubtaskIds()) {
-                deleteSubtask(epic.getId(), index);
-            }
-        }
+        mapOfSubtasks.clear();
         mapOfEpics.clear();
-        epicId = 0;
     }
 
     //Получение по идентификатору.
     public Epic getEpic(int id) {
-        if (mapOfEpics.containsKey(id)) {
-            return mapOfEpics.get(id);
-        }
-        return null;
+        return mapOfEpics.get(id);
     }
 
     //Создание
     public Epic createEpic(Epic epic) {
-        int generatedId = generateEpicId();
-        mapOfEpics.put(generatedId, new Epic(epic.getName(), epic.getDescription(), generatedId, TaskStatus.NEW));
-        System.out.println("Epic[" + generatedId + "] created");
+        mapOfEpics.put(epic.getId(), epic);
+        System.out.println("Epic[" + epic.getId() + "] created");
         return epic;
     }
 
-    public Epic createEpic(String name, String description) {
-        int generatedId = generateEpicId();
-        mapOfEpics.put(generatedId, new Epic(name, description, generatedId, TaskStatus.NEW));
-        System.out.println("Epic[" + generatedId + "] created");
-        return mapOfEpics.get(generatedId);
-    }
-
-    public Epic createEpic(String name, String description, TaskStatus taskStatus) {
-        int generatedId = generateEpicId();
-        mapOfEpics.put(generatedId, new Epic(name, description, generatedId, taskStatus));
-        System.out.println("Epic[" + generatedId + "] created");
-        return mapOfEpics.get(generatedId);
-    }
-
     //Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
-    public Epic updateEpic(int epicId, Epic epic) {
+    public boolean updateEpic(int epicId, String name, String description) {
         if (mapOfEpics.containsKey(epicId)) {
             //first delete the subtasks of the epic and the epic itself
-            deleteEpic(epicId);
-            mapOfEpics.put(epicId, epic);
-            return mapOfEpics.get(epicId);
+            mapOfEpics.get(epicId).setName(name);
+            mapOfEpics.get(epicId).setDescription(description);
+            return true;
         } else {
             System.out.println("There is no such Epic with such id.");
         }
-        return null;
+        return false;
     }
 
     //Удаление по идентификатору.
     public void deleteEpic(int id) {
         if (mapOfEpics.containsKey(id)) {
             for (int index : mapOfEpics.get(id).getSubtaskIds()) {
-                deleteSubtask(id, index);
+                deleteSubtask(index);
             }
             mapOfEpics.remove(id);
         } else {
@@ -190,11 +131,7 @@ public class TaskManager {
         return allSubtasks;
     }
 
-    public int generateEpicId() {
-        return epicId++;
-    }
-
-    public void calculateEpicStatus(int epicId) {
+    private void calculateEpicStatus(int epicId) {
         ArrayList<Integer> retreivedSubtaskIds = mapOfEpics.get(epicId).getSubtaskIds();
         int sizeOfList = retreivedSubtaskIds.size();
         System.out.println("size of subtask list for epic = " + sizeOfList);
@@ -208,10 +145,12 @@ public class TaskManager {
             }
         }
 
-        if (count_done == sizeOfList) {
-            mapOfEpics.get(epicId).setTaskStatus(TaskStatus.DONE);
-        } else if (count_in_progress > 0) {
-            mapOfEpics.get(epicId).setTaskStatus(TaskStatus.IN_PROGRESS);
+        if(sizeOfList != 0) {
+            if (count_done == sizeOfList) {
+                mapOfEpics.get(epicId).setTaskStatus(TaskStatus.DONE);
+            } else if (count_in_progress > 0) {
+                mapOfEpics.get(epicId).setTaskStatus(TaskStatus.IN_PROGRESS);
+            }
         }
     }
 
@@ -219,66 +158,58 @@ public class TaskManager {
 
     //Удаление всех задач
     public void clearAllSubtasks() {
+        for (Epic e : mapOfEpics.values()) {
+            e.removeAllSubtasks();
+            calculateEpicStatus(e.getId());
+        }
         mapOfSubtasks.clear();
     }
 
     // Получение по идентификатору.
     public Subtask getSubtask(int subTaskId) {
-        if (mapOfSubtasks.containsKey(subTaskId)) {
-            return mapOfSubtasks.get(subTaskId);
-        }
-        return null;
+        return mapOfSubtasks.get(subTaskId);
     }
 
     //Создание
-    public Subtask createSubtask(Subtask subtask, int parentEpicId) {
-        int generatedId = generateSubtaskId();
-        mapOfSubtasks.put(generatedId, new Subtask(subtask.getName(), subtask.getDescription(), generatedId, TaskStatus.NEW, parentEpicId));
-        System.out.println("Subtask[" + generatedId + "] created");
+    public Subtask createSubtask(Subtask subtask) {
+        mapOfSubtasks.put(subtask.getId(), subtask);
+        mapOfEpics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
+        calculateEpicStatus(subtask.getEpicId());
+        System.out.println("Subtask[" + subtask.getId() + "] created");
         return subtask;
     }
 
-    public Subtask createSubtask(String name, String description, int parentEpicId) {
-        int generatedId = generateSubtaskId();
-        mapOfSubtasks.put(generatedId, new Subtask(name, description, generatedId, TaskStatus.NEW, parentEpicId));
-        System.out.println("Subtask[" + generatedId + "] created");
-        return mapOfSubtasks.get(generatedId);
-    }
-
-    public Subtask createSubtask(String name, String description, TaskStatus taskStatus, int parentEpicId) {
-        int generatedId = generateSubtaskId();
-        mapOfSubtasks.put(generatedId, new Subtask(name, description, generatedId, taskStatus, parentEpicId));
-        System.out.println("Subtask[" + generatedId + "] created");
-        return mapOfSubtasks.get(generatedId);
-    }
-
     //Обновление
-    public Subtask updateSubtask(int subTaskId, Subtask subtask) {
+    public boolean updateSubtask(int subTaskId, Subtask subtask) {
         if (mapOfSubtasks.containsKey(subTaskId)) {
-            mapOfSubtasks.put(subTaskId, subtask);
-            return mapOfSubtasks.get(subTaskId);
+            if (mapOfSubtasks.get(subTaskId).getEpicId() == subtask.getEpicId()) {
+                mapOfSubtasks.put(subTaskId, subtask);
+                calculateEpicStatus(subtask.getEpicId());
+                return true;
+            } else {
+                System.out.println("The modified subtask's epic id does not match the existing subtask's epic id");
+            }
         } else {
-            System.out.println("There is no such Subtask with such id.");
+            System.out.println("No such subtask with such subtask id exists.");
         }
-        return null;
+        return false;
     }
 
     //Удаление по идентефикатору
-    public void deleteSubtask(int epicId, int index) {
-        mapOfSubtasks.remove(index);
-        mapOfEpics.get(epicId).removeSubtaskId(index);
-    }
-
-    public void updateSubtaskStatus(int subTaskId, TaskStatus taskStatus) {
-        if (mapOfSubtasks.containsKey(subTaskId)) {
-            mapOfSubtasks.get(subTaskId).setTaskStatus(taskStatus);
-            calculateEpicStatus(mapOfSubtasks.get(subTaskId).getEpicId());
+    public boolean deleteSubtask(int index) {
+        if (mapOfSubtasks.containsKey(index)) {
+            int epicId = mapOfSubtasks.get(index).getEpicId();
+            mapOfEpics.get(mapOfSubtasks.get(index).getEpicId()).removeSubtaskId(index);
+            calculateEpicStatus(epicId);
+            mapOfSubtasks.remove(index);
+            return true;
         } else {
-            System.out.println("Status can't be updated, since there is no such a subtask with such id.");
+            System.out.println("There is no subtask with such id");
         }
+        return false;
     }
 
-    public int generateSubtaskId() {
-        return subTaskId++;
+    private static int generateId() {
+        return id++;
     }
 }
