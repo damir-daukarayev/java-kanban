@@ -45,14 +45,6 @@ public class Main {
             System.out.println(sub);
         }
 
-        // 5. Изменение статусов задач и подзадач
-        manager.updateTaskStatus(task1.getId(), TaskStatus.IN_PROGRESS);
-        manager.updateTaskStatus(task2.getId(), TaskStatus.DONE);
-
-        manager.updateSubtaskStatus(subtask1.getId(), TaskStatus.IN_PROGRESS);
-        manager.updateSubtaskStatus(subtask2.getId(), TaskStatus.DONE);
-        manager.updateSubtaskStatus(subtask3.getId(), TaskStatus.DONE);
-
         // 6. Проверка статусов
         System.out.println("\n=== Updated Tasks ===");
         for (Task task : manager.getAllTasks()) {

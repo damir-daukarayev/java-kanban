@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskManager {
-    private static int id = 0;
+    private int id = 0;
     protected HashMap<Integer, Task> mapOfTasks = new HashMap<>();
     protected HashMap<Integer, Epic> mapOfEpics = new HashMap<>();
     protected HashMap<Integer, Subtask> mapOfSubtasks = new HashMap<>();
@@ -38,7 +38,6 @@ public class TaskManager {
     }
 
     public Task createTask(Task task) {
-        //by default all the new tasks have a NEW status
         task.setId(generateId());
         mapOfTasks.put(task.getId(), task);
         System.out.println("Task[" + task.getId() + "] created");
@@ -90,6 +89,7 @@ public class TaskManager {
 
     //Создание
     public Epic createEpic(Epic epic) {
+        epic.setId(generateId());
         mapOfEpics.put(epic.getId(), epic);
         System.out.println("Epic[" + epic.getId() + "] created");
         return epic;
@@ -101,6 +101,19 @@ public class TaskManager {
             //first delete the subtasks of the epic and the epic itself
             mapOfEpics.get(epicId).setName(name);
             mapOfEpics.get(epicId).setDescription(description);
+            return true;
+        } else {
+            System.out.println("There is no such Epic with such id.");
+        }
+        return false;
+    }
+
+    //Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
+    public boolean updateEpic(Epic epic) {
+        if (mapOfEpics.containsKey(epic.getId())) {
+            //first delete the subtasks of the epic and the epic itself
+            mapOfEpics.get(epic.getId()).setName(epic.getName());
+            mapOfEpics.get(epic.getId()).setDescription(epic.getName());
             return true;
         } else {
             System.out.println("There is no such Epic with such id.");
@@ -135,6 +148,12 @@ public class TaskManager {
         ArrayList<Integer> retreivedSubtaskIds = mapOfEpics.get(epicId).getSubtaskIds();
         int sizeOfList = retreivedSubtaskIds.size();
         System.out.println("size of subtask list for epic = " + sizeOfList);
+
+        if (sizeOfList == 0) {
+            mapOfEpics.get(epicId).setTaskStatus(TaskStatus.NEW);
+            return;
+        }
+
         int count_in_progress = 0;
         int count_done = 0;
         for (int index : retreivedSubtaskIds) {
@@ -145,12 +164,10 @@ public class TaskManager {
             }
         }
 
-        if(sizeOfList != 0) {
-            if (count_done == sizeOfList) {
-                mapOfEpics.get(epicId).setTaskStatus(TaskStatus.DONE);
-            } else if (count_in_progress > 0) {
-                mapOfEpics.get(epicId).setTaskStatus(TaskStatus.IN_PROGRESS);
-            }
+        if (count_done == sizeOfList) {
+            mapOfEpics.get(epicId).setTaskStatus(TaskStatus.DONE);
+        } else if (count_in_progress > 0) {
+            mapOfEpics.get(epicId).setTaskStatus(TaskStatus.IN_PROGRESS);
         }
     }
 
@@ -172,18 +189,24 @@ public class TaskManager {
 
     //Создание
     public Subtask createSubtask(Subtask subtask) {
-        mapOfSubtasks.put(subtask.getId(), subtask);
-        mapOfEpics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
-        calculateEpicStatus(subtask.getEpicId());
-        System.out.println("Subtask[" + subtask.getId() + "] created");
-        return subtask;
+        if (mapOfEpics.containsKey(subtask.getEpicId())) {
+            subtask.setId(generateId());
+            mapOfSubtasks.put(subtask.getId(), subtask);
+            mapOfEpics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
+            calculateEpicStatus(subtask.getEpicId());
+            System.out.println("Subtask[" + subtask.getId() + "] created");
+            return subtask;
+        } else {
+            System.out.println("There is no such epic for a subtask to be associated to.");
+        }
+        return null;
     }
 
     //Обновление
-    public boolean updateSubtask(int subTaskId, Subtask subtask) {
-        if (mapOfSubtasks.containsKey(subTaskId)) {
-            if (mapOfSubtasks.get(subTaskId).getEpicId() == subtask.getEpicId()) {
-                mapOfSubtasks.put(subTaskId, subtask);
+    public boolean updateSubtask(Subtask subtask) {
+        if (mapOfSubtasks.containsKey(subtask.getId())) {
+            if (mapOfSubtasks.get(subtask.getId()).getEpicId() == subtask.getEpicId()) {
+                mapOfSubtasks.put(subtask.getId(), subtask);
                 calculateEpicStatus(subtask.getEpicId());
                 return true;
             } else {
@@ -209,7 +232,7 @@ public class TaskManager {
         return false;
     }
 
-    private static int generateId() {
-        return id++;
+    private int generateId() {
+        return this.id++;
     }
 }
