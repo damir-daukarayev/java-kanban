@@ -1,4 +1,5 @@
-import manager.TaskManager;
+import manager.InMemoryTaskManager;
+import manager.Managers;
 import modelling.Epic;
 import modelling.Subtask;
 import modelling.Task;
@@ -6,7 +7,7 @@ import modelling.TaskStatus;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager manager = new TaskManager();
+        InMemoryTaskManager manager = Managers.getDefault();
 
         // 1. Создание двух задач
         Task task1 = manager.createTask(new Task("Task 1", "Description of Task 1"));
@@ -82,6 +83,32 @@ public class Main {
         System.out.println("\nSubtasks of remaining epics:");
         for (Subtask sub : manager.getAllEpicSubtasks(epic2.getId())) {
             System.out.println(sub);
+        }
+
+        printAllTasks(manager);
+    }
+
+    private static void printAllTasks(InMemoryTaskManager manager) {
+        System.out.println("\n\n\nЗадачи:");
+        for (Task task : manager.getAllTasks()) {
+            System.out.println(task);
+        }
+        System.out.println("Эпики:");
+        for (Task epic : manager.getAllEpics()) {
+            System.out.println(epic);
+
+            for (Task task : manager.getAllEpicSubtasks(epic.getId())) {
+                System.out.println("--> " + task);
+            }
+        }
+        System.out.println("Подзадачи:");
+        for (Task subtask : manager.getAllSubtasks()) {
+            System.out.println(subtask);
+        }
+
+        System.out.println("История:");
+        for (Task task : manager.getHistory()) {
+            System.out.println(task);
         }
     }
 }
