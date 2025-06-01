@@ -36,12 +36,22 @@ public class TaskManagerTest {
 
         // manually set subtask's id to its epic's id
         Subtask invalidSubtask = new Subtask("Sub A", "Sub Desc", TaskStatus.NEW, epic.getId());
+        manager.createSubtask(invalidSubtask);
+        assertFalse(invalidSubtask.setId(epic.getId()),"Epic не должен содержать сам себя как подзадачу");
+    }
+
+    // дополнение к предыдущему тесту
+    @Test
+    public void shouldNotAllowEpicToHaveIdAsItsEpic() {
+        Epic epic = new Epic("Epic A", "Description");
+        manager.createEpic(epic); // ID присваивается внутри
+
+        // manually set subtask's id to its epic's id
+        Subtask invalidSubtask = new Subtask("Sub A", "Sub Desc", TaskStatus.NEW, epic.getId());
+        manager.createSubtask(invalidSubtask);
         invalidSubtask.setId(epic.getId());
 
-        //upon creation null should be returned
-        Subtask createdSubtask = manager.createSubtask(invalidSubtask);
-
-        assertNull(createdSubtask, "Epic не должен содержать сам себя как подзадачу");
+        assertNotEquals(epic.getId(), invalidSubtask.getId());
     }
 
     @Test
@@ -77,26 +87,6 @@ public class TaskManagerTest {
         assertEquals(epic, manager.getEpic(epic.getId()));
         assertEquals(subtask, manager.getSubtask(subtask.getId()));
     }
-
-//    @Test
-//    public void shouldNotConflictManuallyAssignedAndGeneratedIds() {
-//        InMemoryTaskManager manager = new InMemoryTaskManager();
-//
-//        Task manualTask = new Task("Manual Task", "Set custom ID");
-//        manualTask.setId(100);
-//
-//        // Create a task through the manager (uses auto ID generation)
-//        Task autoTask = new Task("Auto Task", "Let manager assign ID");
-//        Task createdTask = manager.createTask(autoTask);
-//
-//        // Ensure both tasks are present and IDs are not conflicting
-//        assertEquals(manualTask, manager.getTask(100), "Manually added task should be retrievable");
-//        assertNotEquals(100, createdTask.getId(), "Automatically assigned ID should not be 42");
-//        assertEquals(createdTask, manager.getTask(createdTask.getId()), "Auto-created task should be retrievable");
-//
-//        // Ensure both tasks coexist in the manager
-//        assertEquals(2, manager.getAllTasks().size(), "В системе должно быть 2 задачи");
-//    }
 
     @Test
     public void shouldNotModifyTaskOnAdd() {

@@ -18,7 +18,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (history.size() == LIMIT) {
             history.pollFirst();
         }
-        history.addLast(task);
+        history.addLast(task.copy());
     }
 
     @Override

@@ -8,12 +8,13 @@ import modelling.TaskStatus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
     private int id = 0;
-    protected HashMap<Integer, Task> mapOfTasks = new HashMap<>();
-    protected HashMap<Integer, Epic> mapOfEpics = new HashMap<>();
-    protected HashMap<Integer, Subtask> mapOfSubtasks = new HashMap<>();
+    protected Map<Integer, Task> mapOfTasks = new HashMap<>();
+    protected Map<Integer, Epic> mapOfEpics = new HashMap<>();
+    protected Map<Integer, Subtask> mapOfSubtasks = new HashMap<>();
 
     private final HistoryManager history = Managers.getDefaultHistory();
 
@@ -110,6 +111,7 @@ public class InMemoryTaskManager implements TaskManager {
     //Создание
     @Override
     public Epic createEpic(Epic epic) {
+        //в соответсвии с переделанным setId
         epic.setId(generateId());
         mapOfEpics.put(epic.getId(), epic);
         System.out.println("Epic[" + epic.getId() + "] created");
@@ -244,11 +246,6 @@ public class InMemoryTaskManager implements TaskManager {
     //Создание
     @Override
     public Subtask createSubtask(Subtask subtask) {
-//        if (subtask.getEpicId() == subtask.getId()) {
-//            //throw new IllegalArgumentException("Subtask cannot reference itself as an epic.");
-//            return null;
-//        }
-
         if (mapOfEpics.containsKey(subtask.getEpicId())) {
             subtask.setId(generateId());
             mapOfSubtasks.put(subtask.getId(), subtask);
@@ -298,6 +295,7 @@ public class InMemoryTaskManager implements TaskManager {
         return this.id++;
     }
 
+    @Override
     public List<Task> getHistory() {
         return history.getHistory();
     }

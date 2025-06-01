@@ -4,12 +4,12 @@ import modelling.Epic;
 import modelling.Subtask;
 import modelling.Task;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     //Task methods
     //Получение списка всех задач.
-    ArrayList<Task> getAllTasks();
+    List<Task> getAllTasks();
 
     //Удаление всех задач.
     void clearAllTasks();
@@ -26,7 +26,7 @@ public interface TaskManager {
     void deleteTask(int id);
 
     //Получение списка всех задач.
-    ArrayList<Epic> getAllEpics();
+    List<Epic> getAllEpics();
 
     //Удаление всех задач.
     //deleting an epic also triggers deleting its subtasks
@@ -48,7 +48,7 @@ public interface TaskManager {
     void deleteEpic(int id);
 
     //Получение списка всех подзадач определённого эпика.
-    ArrayList<Subtask> getAllEpicSubtasks(int epicId);
+    List<Subtask> getAllEpicSubtasks(int epicId);
 
     //Удаление всех задач
     void clearAllSubtasks();
@@ -56,7 +56,7 @@ public interface TaskManager {
     // Получение по идентификатору.
     Subtask getSubtask(int subTaskId);
 
-    ArrayList<Subtask> getAllSubtasks();
+    List<Subtask> getAllSubtasks();
 
     //Создание
     Subtask createSubtask(Subtask subtask);
@@ -66,4 +66,7 @@ public interface TaskManager {
 
     //Удаление по идентефикатору
     boolean deleteSubtask(int index);
+
+    //Получить историю тасков, к которым мы получали доступ
+    List<Task> getHistory();
 }

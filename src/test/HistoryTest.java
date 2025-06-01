@@ -1,6 +1,8 @@
 package test;
 
+import manager.InMemoryHistoryManager;
 import manager.InMemoryTaskManager;
+import manager.Managers;
 import modelling.Epic;
 import modelling.Subtask;
 import modelling.Task;
@@ -8,7 +10,6 @@ import modelling.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static modelling.TaskStatus.NEW;
@@ -17,10 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HistoryTest {
 
     private InMemoryTaskManager taskManager;
+    private InMemoryHistoryManager historyManager;
 
     @BeforeEach
     void setUp() {
         taskManager = new InMemoryTaskManager();
+        historyManager = new InMemoryHistoryManager();
     }
 
     @Test
@@ -95,17 +98,18 @@ public class HistoryTest {
         assertEquals(task, history.get(1));
     }
 
-//    @Test
-//    void modifyingReturnedListShouldNotAffectInternalHistory() {
-//        Task task = new Task("Test", "Protect internal");
-//        historyManager.add(task);
-//
-//        List<Task> externalHistory = historyManager.getHistory();
-//        externalHistory.clear();
-//
-//        List<Task> actualHistory = historyManager.getHistory();
-//        assertEquals(1, actualHistory.size());
-//    }
+    //доп тест
+    @Test
+    void modifyingReturnedListShouldNotAffectInternalHistory() {
+        Task task = new Task("Test", "Protect internal");
+        historyManager.add(task);
+
+        List<Task> externalHistory = historyManager.getHistory();
+        externalHistory.clear();
+
+        List<Task> actualHistory = historyManager.getHistory();
+        assertEquals(1, actualHistory.size());
+    }
 
     @Test
     void addNewTask() {

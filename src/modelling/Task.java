@@ -40,8 +40,12 @@ public class Task {
         return id;
     }
 
-    public void setId(int id) {
+    public boolean setId(int id) {
+        // переделал в boolean, чтобы можно было отслеживать возможность действия
+        // при работе с тестами для TaskManager обнаружилось, что невозможно правильно
+        // обработать случай, когда id у subtask и epic равны
         this.id = id;
+        return true;
     }
 
     public TaskStatus getTaskStatus() {
@@ -50,6 +54,14 @@ public class Task {
 
     public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    // Для правильного сохранения тасков в истории
+    // таким образом удастся детально сохранять таск
+    public Task copy() {
+        Task copy = new Task(this.name, this.description, this.taskStatus);
+        copy.setId(this.id);
+        return copy;
     }
 
     @Override
