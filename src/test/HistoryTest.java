@@ -57,18 +57,18 @@ public class HistoryTest {
     }
 
     @Test
-    void shouldStoreLast10ViewedTasks() {
+    void shouldStoreLast12ViewedTasks() {
         for (int i = 0; i < 12; i++) {
             Task task = taskManager.createTask(new Task("Task " + i, "Desc"));
             taskManager.getTask(task.getId());
         }
 
         List<Task> history = taskManager.getHistory();
-        assertEquals(10, history.size(), "История должна содержать только 10 последних задач");
+        assertEquals(12, history.size(), "История должна содержать только 10 последних задач");
 
         // Check that only the last 10 accessed tasks are stored
-        for (int i = 2; i < 12; i++) {
-            assertEquals("Task " + i, history.get(i - 2).getName());
+        for (int i = 0; i < 12; i++) {
+            assertEquals("Task " + i, history.get(i).getName());
         }
     }
 
@@ -84,18 +84,6 @@ public class HistoryTest {
 
         List<Task> history = taskManager.getHistory();
         assertEquals(3, history.size());
-    }
-
-    @Test
-    void shouldAllowDuplicateViewsInHistory() {
-        Task task = taskManager.createTask(new Task("Repeating Task", "Description"));
-        taskManager.getTask(task.getId());
-        taskManager.getTask(task.getId());
-
-        List<Task> history = taskManager.getHistory();
-        assertEquals(2, history.size());
-        assertEquals(task, history.get(0));
-        assertEquals(task, history.get(1));
     }
 
     //доп тест
@@ -126,6 +114,66 @@ public class HistoryTest {
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
         assertEquals(task, tasks.get(0), "Задачи не совпадают.");
+    }
+
+    @Test
+    public void shouldReturnLastElementAsTask3AfterReAccess() {
+        Task task1 = taskManager.createTask(new Task("Task 1", "Description 0", NEW));
+        Task task2 = taskManager.createTask(new Task("Task 2", "Description 0", NEW));
+        Task task3 = taskManager.createTask(new Task("Task 3", "Description 0", NEW));
+        Task task4 = taskManager.createTask(new Task("Task 4", "Description 0", NEW));
+
+        for (int i = 0; i < 4; i++) {
+            taskManager.getTask(i);
+        }
+
+        List<Task> history = taskManager.getHistory();
+        assertEquals(4, history.size());
+
+        // Теперь получаем повторный доступ к задаче 3 (индекс 2)
+        // последний элемент в листе должен быть "Задача 3"
+        taskManager.getTask(2);
+        history = taskManager.getHistory();
+        assertEquals(task3, history.getLast());
+    }
+
+    @Test
+    public void shouldReturnFirstAccessedTaskAfterReAccess() {
+        Task task1 = taskManager.createTask(new Task("Task 1", "Description 0", NEW));
+        Task task2 = taskManager.createTask(new Task("Task 2", "Description 0", NEW));
+        Task task3 = taskManager.createTask(new Task("Task 3", "Description 0", NEW));
+        Task task4 = taskManager.createTask(new Task("Task 4", "Description 0", NEW));
+
+        for (int i = 0; i < 4; i++) {
+            taskManager.getTask(i);
+        }
+
+        List<Task> history = taskManager.getHistory();
+        assertEquals(task1, history.getFirst());
+        assertEquals(task4, history.getLast());
+
+        taskManager.getTask(0);
+        history = taskManager.getHistory();
+        // Первая задача в списке теперь задача № 2, а не № 1
+        assertEquals(task2, history.getFirst());
+        // Последняя задача в списке теперь точно не задача № 4
+        assertNotEquals(task4, history.getLast());
+        // Последняя задача в списке теперь задача № 1, а не № 4
+        assertEquals(task1, history.getLast());
+    }
+
+    @Test
+    public void shoudlReturnSize0AfterRemovalViaInMemoryTaskManager() {
+        Task task1 = taskManager.createTask(new Task("Task 1", "Description 0", NEW));
+        taskManager.getTask(0);
+        List<Task> history = taskManager.getHistory();
+
+        assertEquals(1, history.size());
+
+        taskManager.deleteTask(0);
+        history = taskManager.getHistory();
+
+        assertEquals(0, history.size());
     }
 }
 
