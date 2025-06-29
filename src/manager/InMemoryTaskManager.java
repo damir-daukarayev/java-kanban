@@ -72,6 +72,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTask(int id) {
         if (mapOfTasks.containsKey(id)) {
             mapOfTasks.remove(id);
+            history.remove(id);
         } else {
             System.out.println("Such a task with such id does not exist.");
         }
@@ -154,6 +155,7 @@ public class InMemoryTaskManager implements TaskManager {
                 deleteSubtask(index);
             }
             mapOfEpics.remove(id);
+            history.remove(id);
         } else {
             System.out.println("Such epic with such id does not exist.");
         }
@@ -283,6 +285,7 @@ public class InMemoryTaskManager implements TaskManager {
             int epicId = mapOfSubtasks.get(index).getEpicId();
             mapOfEpics.get(mapOfSubtasks.get(index).getEpicId()).removeSubtaskId(index);
             mapOfSubtasks.remove(index);
+            history.remove(id);
             calculateEpicStatus(epicId);
             return true;
         } else {
