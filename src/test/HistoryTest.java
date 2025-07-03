@@ -117,10 +117,10 @@ public class HistoryTest {
 
     @Test
     public void shouldReturnLastElementAsTask3AfterReAccess() {
-        Task task1 = taskManager.createTask(new Task("Task 1", "Description 0", NEW));
-        Task task2 = taskManager.createTask(new Task("Task 2", "Description 0", NEW));
-        Task task3 = taskManager.createTask(new Task("Task 3", "Description 0", NEW));
-        Task task4 = taskManager.createTask(new Task("Task 4", "Description 0", NEW));
+        Task task1 = taskManager.createTask(new Task("Task 1", "Description 1", NEW));
+        Task task2 = taskManager.createTask(new Task("Task 2", "Description 2", NEW));
+        Task task3 = taskManager.createTask(new Task("Task 3", "Description 3", NEW));
+        Task task4 = taskManager.createTask(new Task("Task 4", "Description 4", NEW));
 
         for (int i = 0; i < 4; i++) {
             taskManager.getTask(i);
@@ -138,10 +138,10 @@ public class HistoryTest {
 
     @Test
     public void shouldReturnFirstAccessedTaskAfterReAccess() {
-        Task task1 = taskManager.createTask(new Task("Task 1", "Description 0", NEW));
-        Task task2 = taskManager.createTask(new Task("Task 2", "Description 0", NEW));
-        Task task3 = taskManager.createTask(new Task("Task 3", "Description 0", NEW));
-        Task task4 = taskManager.createTask(new Task("Task 4", "Description 0", NEW));
+        Task task1 = taskManager.createTask(new Task("Task 1", "Description 1", NEW));
+        Task task2 = taskManager.createTask(new Task("Task 2", "Description 2", NEW));
+        Task task3 = taskManager.createTask(new Task("Task 3", "Description 3", NEW));
+        Task task4 = taskManager.createTask(new Task("Task 4", "Description 4", NEW));
 
         for (int i = 0; i < 4; i++) {
             taskManager.getTask(i);
@@ -172,6 +172,128 @@ public class HistoryTest {
         taskManager.deleteTask(0);
         history = taskManager.getHistory();
 
+        assertEquals(0, history.size());
+    }
+
+    @Test
+    public void shouldReturnSize0AfterMassDeletionOfTasks() {
+        Task task1 = taskManager.createTask(new Task("Task 1", "Description 1", NEW));
+        Task task2 = taskManager.createTask(new Task("Task 2", "Description 2", NEW));
+        Task task3 = taskManager.createTask(new Task("Task 3", "Description 3", NEW));
+        Task task4 = taskManager.createTask(new Task("Task 4", "Description 4", NEW));
+
+        for (int i = 0; i < 4; i++) {
+            taskManager.getTask(i);
+        }
+        List<Task> history = taskManager.getHistory();
+        assertEquals(4, history.size());
+
+        taskManager.clearAllTasks();
+        history = taskManager.getHistory();
+        assertEquals(0, history.size());
+    }
+
+    @Test
+    public void shouldReturnSize0AfterMassDeletionOfEpicsOnly() {
+        Epic task1 = taskManager.createEpic(new Epic("Epic 1", "Description 1"));
+        Epic task2 = taskManager.createEpic(new Epic("Epic 2", "Description 2"));
+        Epic task3 = taskManager.createEpic(new Epic("Epic 3", "Description 3"));
+        Epic task4 = taskManager.createEpic(new Epic("Epic 4", "Description 4"));
+
+        for (int i = 0; i < 4; i++) {
+            taskManager.getEpic(i);
+        }
+        List<Task> history = taskManager.getHistory();
+        assertEquals(4, history.size());
+
+        taskManager.clearAllEpics();
+        history = taskManager.getHistory();
+        assertEquals(0, history.size());
+    }
+
+    @Test
+    public void shouldReturnSize4AfterMassDeletionOfSubtasks() {
+        Epic task1 = taskManager.createEpic(new Epic("Epic 1", "Description 1"));
+        Epic task2 = taskManager.createEpic(new Epic("Epic 2", "Description 2"));
+        Epic task3 = taskManager.createEpic(new Epic("Epic 3", "Description 3"));
+        Epic task4 = taskManager.createEpic(new Epic("Epic 4", "Description 4"));
+
+        Subtask subtask1 = taskManager.createSubtask(
+                new Subtask("Subtask1", "Description of subtask1", NEW, task1.getId())
+        );
+        Subtask subtask2 = taskManager.createSubtask(
+                new Subtask("Subtask2", "Description of subtask2", NEW, task1.getId())
+        );
+        Subtask subtask3 = taskManager.createSubtask(
+                new Subtask("Subtask3", "Description of subtask3", NEW, task2.getId())
+        );
+        Subtask subtask4 = taskManager.createSubtask(
+                new Subtask("Subtask4", "Description of subtask4", NEW, task3.getId())
+        );
+        Subtask subtask5 = taskManager.createSubtask(
+                new Subtask("Subtask5", "Description of subtask5", NEW, task3.getId())
+        );
+        Subtask subtask6 = taskManager.createSubtask(
+                new Subtask("Subtask6", "Description of subtask6", NEW, task3.getId())
+        );
+        Subtask subtask7 = taskManager.createSubtask(
+                new Subtask("Subtask7", "Description of subtask7", NEW, task4.getId())
+        );
+
+        for (int i = 0; i < 4; i++) {
+            taskManager.getEpic(i);
+        }
+
+        taskManager.getAllSubtasks();
+
+        List<Task> history = taskManager.getHistory();
+        assertEquals(11, history.size());
+
+        taskManager.clearAllSubtasks();
+        history = taskManager.getHistory();
+        assertEquals(4, history.size());
+    }
+
+    @Test
+    public void shouldReturnSize0AfterMassDeletionOfEpics() {
+        Epic task1 = taskManager.createEpic(new Epic("Epic 1", "Description 1"));
+        Epic task2 = taskManager.createEpic(new Epic("Epic 2", "Description 2"));
+        Epic task3 = taskManager.createEpic(new Epic("Epic 3", "Description 3"));
+        Epic task4 = taskManager.createEpic(new Epic("Epic 4", "Description 4"));
+
+        Subtask subtask1 = taskManager.createSubtask(
+                new Subtask("Subtask1", "Description of subtask1", NEW, task1.getId())
+        );
+        Subtask subtask2 = taskManager.createSubtask(
+                new Subtask("Subtask2", "Description of subtask2", NEW, task1.getId())
+        );
+        Subtask subtask3 = taskManager.createSubtask(
+                new Subtask("Subtask3", "Description of subtask3", NEW, task2.getId())
+        );
+        Subtask subtask4 = taskManager.createSubtask(
+                new Subtask("Subtask4", "Description of subtask4", NEW, task3.getId())
+        );
+        Subtask subtask5 = taskManager.createSubtask(
+                new Subtask("Subtask5", "Description of subtask5", NEW, task3.getId())
+        );
+        Subtask subtask6 = taskManager.createSubtask(
+                new Subtask("Subtask6", "Description of subtask6", NEW, task3.getId())
+        );
+        Subtask subtask7 = taskManager.createSubtask(
+                new Subtask("Subtask7", "Description of subtask7", NEW, task4.getId())
+        );
+
+        for (int i = 0; i < 4; i++) {
+            taskManager.getEpic(i);
+        }
+
+        taskManager.getAllSubtasks();
+
+        List<Task> history = taskManager.getHistory();
+        assertEquals(11, history.size());
+
+        taskManager.clearAllEpics();
+        history = taskManager.getHistory();
         assertEquals(0, history.size());
     }
 }

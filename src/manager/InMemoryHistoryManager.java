@@ -53,7 +53,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         last = node;
 
-        nodes.put(node.value.getId(), node);
+        nodes.put(task.getId(), node);
     }
 
     @Override
