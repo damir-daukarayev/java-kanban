@@ -27,12 +27,21 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("=".repeat(50));
             return new ArrayList<>();
         }
+
+        for (Map.Entry<Integer, Task> e : mapOfTasks.entrySet()) {
+            history.add(e.getValue());
+        }
+
         return new ArrayList<>(mapOfTasks.values());
     }
 
     //Удаление всех задач.
     @Override
     public void clearAllTasks() {
+        // Удалить все из истории при массовом удалении задач
+        for (Map.Entry<Integer, Task> e : mapOfTasks.entrySet()) {
+            history.remove(e.getKey());
+        }
         mapOfTasks.clear();
         System.out.println("All of the tasks were deleted");
         System.out.println("=".repeat(50));
@@ -72,6 +81,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTask(int id) {
         if (mapOfTasks.containsKey(id)) {
             mapOfTasks.remove(id);
+            history.remove(id);
         } else {
             System.out.println("Such a task with such id does not exist.");
         }
@@ -87,6 +97,11 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("=".repeat(50));
             return new ArrayList<>();
         }
+
+        for (Map.Entry<Integer, Epic> e : mapOfEpics.entrySet()) {
+            history.add(e.getValue());
+        }
+
         return new ArrayList<>(mapOfEpics.values());
     }
 
@@ -94,6 +109,14 @@ public class InMemoryTaskManager implements TaskManager {
     //deleting an epic also triggers deleting its subtasks
     @Override
     public void clearAllEpics() {
+        // Удалить все из истории при массовом удалении задач
+        for (Map.Entry<Integer, Subtask> e : mapOfSubtasks.entrySet()) {
+            history.remove(e.getKey());
+        }
+        for (Map.Entry<Integer, Epic> e : mapOfEpics.entrySet()) {
+            history.remove(e.getKey());
+        }
+
         mapOfSubtasks.clear();
         mapOfEpics.clear();
     }
@@ -154,6 +177,7 @@ public class InMemoryTaskManager implements TaskManager {
                 deleteSubtask(index);
             }
             mapOfEpics.remove(id);
+            history.remove(id);
         } else {
             System.out.println("Such epic with such id does not exist.");
         }
@@ -220,6 +244,10 @@ public class InMemoryTaskManager implements TaskManager {
             e.removeAllSubtasks();
             calculateEpicStatus(e.getId());
         }
+        // Удалить все из истории при массовом удалении задач
+        for (Map.Entry<Integer, Subtask> e : mapOfSubtasks.entrySet()) {
+            history.remove(e.getKey());
+        }
         mapOfSubtasks.clear();
     }
 
@@ -240,6 +268,11 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("=".repeat(50));
             return new ArrayList<>();
         }
+
+        for (Map.Entry<Integer, Subtask> e : mapOfSubtasks.entrySet()) {
+            history.add(e.getValue());
+        }
+
         return new ArrayList<>(mapOfSubtasks.values());
     }
 
@@ -283,6 +316,7 @@ public class InMemoryTaskManager implements TaskManager {
             int epicId = mapOfSubtasks.get(index).getEpicId();
             mapOfEpics.get(mapOfSubtasks.get(index).getEpicId()).removeSubtaskId(index);
             mapOfSubtasks.remove(index);
+            history.remove(id);
             calculateEpicStatus(epicId);
             return true;
         } else {
