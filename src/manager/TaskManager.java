@@ -68,5 +68,5 @@ public interface TaskManager {
     boolean deleteSubtask(int index);
 
     //Получить историю тасков, к которым мы получали доступ
-    List<Task> getHistory();
+    List<Task> getHistoryManager();
 }

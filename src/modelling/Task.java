@@ -56,6 +56,10 @@ public class Task {
         this.taskStatus = taskStatus;
     }
 
+    public String getType() {
+        return "Task";
+    }
+
     // Для правильного сохранения тасков в истории
     // таким образом удастся детально сохранять таск
     public Task copy() {

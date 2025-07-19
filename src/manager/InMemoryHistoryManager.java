@@ -5,7 +5,7 @@ import modelling.Task;
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private Map<Integer, Node> nodes = new HashMap<>();
+    protected Map<Integer, Node> nodes = new HashMap<>();
     Node first;
     Node last;
 
