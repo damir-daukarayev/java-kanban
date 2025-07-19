@@ -49,8 +49,6 @@ public class FileBackedTaskManagerTest {
 
     @Test
     void shouldLoadEmptyFileCorrectly() {
-        // Here, 'manager' (FileBackedTaskManager) is already initialized with an empty file
-        // No need to create tasks for this test, as we are testing loading an empty file.
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
         assertTrue(loadedManager.getAllTasks().isEmpty(), "Список тасков должен быть пустой.");
