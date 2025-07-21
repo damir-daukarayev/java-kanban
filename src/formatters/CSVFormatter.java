@@ -12,20 +12,20 @@ public class CSVFormatter {
 
     //таск превращает в CSV строку
     public static String toCSVString(Task task) {
-        return  task.getId() + "," + task.getType() + "," + task.getName() + "," +
-                "" + task.getTaskStatus() + "," + task.getDescription() + ",";
+        return  task.getId() + "," + task.getType() + "," + task.getName() + ","
+                + task.getTaskStatus() + "," + task.getDescription() + ",";
     }
 
     //эпик превращает в CSV строку
     public static String toCSVString(Epic epic) {
-        return  epic.getId() + "," + epic.getType() + "," + epic.getName() + "," +
-                "" + epic.getTaskStatus() + "," + epic.getDescription() + ",";
+        return  epic.getId() + "," + epic.getType() + "," + epic.getName() + ","
+                + epic.getTaskStatus() + "," + epic.getDescription() + ",";
     }
 
     //сабтаск превращает в CSV строку
     public static String toCSVString(Subtask subtask) {
         return  subtask.getId() + "," + subtask.getType() + "," + subtask.getName() + "," +
-                "" + subtask.getTaskStatus() + "," + subtask.getDescription() + "," + subtask.getEpicId();
+                subtask.getTaskStatus() + "," + subtask.getDescription() + "," + subtask.getEpicId();
     }
 
     //CSV строку превращаем в таск

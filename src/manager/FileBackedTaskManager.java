@@ -1,5 +1,6 @@
 package manager;
 
+import exceptions.ManagerSaveException;
 import formatters.CSVFormatter;
 import modelling.Epic;
 import modelling.Subtask;
@@ -16,13 +17,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void clearAllEpics() {
         super.clearAllEpics();
         save();
-    }
-
-    @Override
-    public Epic getEpic(int id) {
-        Epic epic = super.getEpic(id);
-        save();
-        return epic;
     }
 
     @Override
@@ -56,13 +50,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void clearAllSubtasks() {
         super.clearAllSubtasks();
         save();
-    }
-
-    @Override
-    public Subtask getSubtask(int subTaskId) {
-        Subtask subtask = super.getSubtask(subTaskId);
-        save();
-        return subtask;
     }
 
     @Override
@@ -118,7 +105,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try {
             fileContent = Files.readString(file.toPath());
         } catch (IOException exception) {
-            throw new RuntimeException("Ошибка при чтении файла: " + file.getName(), exception);
+            throw new ManagerSaveException("Ошибка при чтении файла: " + file.getName(), exception);
         }
 
         String[] lines = fileContent.split(System.lineSeparator());
@@ -139,11 +126,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             switch (task.getType()) {
                 case "Task":
                     taskManager.mapOfTasks.put(currentId, task);
-                    taskManager.historyManager.add(task);
                     break;
                 case "Epic":
                     taskManager.mapOfEpics.put(currentId, (Epic) task);
-                    taskManager.historyManager.add(task);
                     break;
                 case "Subtask":
                     Subtask subtask = (Subtask) task;
@@ -154,7 +139,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     } else {
                         System.err.println("Ошибка: Subtask " + currentId + " относится к несуществующему эпику " + subtask.getEpicId());
                     }
-                    taskManager.historyManager.add(task);
                     break;
             }
         }
@@ -162,13 +146,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         taskManager.id = maxId + 1;
 
         return taskManager;
-    }
-
-    @Override
-    public Task getTask(int id) {
-        Task task = super.getTask(id);
-        save();
-        return task;
     }
 
     @Override
@@ -228,7 +205,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         } catch (IOException exception) {
             System.err.println("Ошибка при сохранении состояния: " + exception.getMessage());
-            throw new RuntimeException("Не удалось сохранить", exception);
+            throw new ManagerSaveException("Не удалось сохранить", exception);
         }
     }
 }
