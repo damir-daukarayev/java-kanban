@@ -27,7 +27,7 @@ public class HistoryTest {
 
     @Test
     void shouldReturnEmptyHistoryInitially() {
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertTrue(history.isEmpty(), "История должна быть пустой после инициализации");
     }
 
@@ -36,7 +36,7 @@ public class HistoryTest {
         Task task = taskManager.createTask(new Task("Test Task", "Description"));
         taskManager.getTask(task.getId());
 
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(1, history.size(), "История должна содержать 1 элемент");
         assertEquals(task, history.get(0), "Добавленная задача должна быть в истории");
     }
@@ -49,7 +49,7 @@ public class HistoryTest {
         taskManager.getEpic(epic.getId());
         taskManager.getSubtask(subtask.getId());
 
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(2, history.size());
         assertEquals(epic, history.get(0));
         assertEquals(subtask, history.get(1));
@@ -62,7 +62,7 @@ public class HistoryTest {
             taskManager.getTask(task.getId());
         }
 
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(12, history.size(), "История должна содержать только 10 последних задач");
 
         // Check that only the last 10 accessed tasks are stored
@@ -81,7 +81,7 @@ public class HistoryTest {
         taskManager.getEpic(epic.getId());
         taskManager.getSubtask(subtask.getId());
 
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(3, history.size());
     }
 
@@ -126,13 +126,13 @@ public class HistoryTest {
             taskManager.getTask(i);
         }
 
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(4, history.size());
 
         // Теперь получаем повторный доступ к задаче 3 (индекс 2)
         // последний элемент в листе должен быть "Задача 3"
         taskManager.getTask(2);
-        history = taskManager.getHistory();
+        history = taskManager.getHistoryManager();
         assertEquals(task3, history.getLast());
     }
 
@@ -147,12 +147,12 @@ public class HistoryTest {
             taskManager.getTask(i);
         }
 
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(task1, history.getFirst());
         assertEquals(task4, history.getLast());
 
         taskManager.getTask(0);
-        history = taskManager.getHistory();
+        history = taskManager.getHistoryManager();
         // Первая задача в списке теперь задача № 2, а не № 1
         assertEquals(task2, history.getFirst());
         // Последняя задача в списке теперь точно не задача № 4
@@ -165,12 +165,12 @@ public class HistoryTest {
     public void shoudlReturnSize0AfterRemovalViaInMemoryTaskManager() {
         Task task1 = taskManager.createTask(new Task("Task 1", "Description 0", NEW));
         taskManager.getTask(0);
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
 
         assertEquals(1, history.size());
 
         taskManager.deleteTask(0);
-        history = taskManager.getHistory();
+        history = taskManager.getHistoryManager();
 
         assertEquals(0, history.size());
     }
@@ -185,11 +185,11 @@ public class HistoryTest {
         for (int i = 0; i < 4; i++) {
             taskManager.getTask(i);
         }
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(4, history.size());
 
         taskManager.clearAllTasks();
-        history = taskManager.getHistory();
+        history = taskManager.getHistoryManager();
         assertEquals(0, history.size());
     }
 
@@ -203,11 +203,11 @@ public class HistoryTest {
         for (int i = 0; i < 4; i++) {
             taskManager.getEpic(i);
         }
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(4, history.size());
 
         taskManager.clearAllEpics();
-        history = taskManager.getHistory();
+        history = taskManager.getHistoryManager();
         assertEquals(0, history.size());
     }
 
@@ -246,11 +246,11 @@ public class HistoryTest {
 
         taskManager.getAllSubtasks();
 
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(11, history.size());
 
         taskManager.clearAllSubtasks();
-        history = taskManager.getHistory();
+        history = taskManager.getHistoryManager();
         assertEquals(4, history.size());
     }
 
@@ -289,11 +289,11 @@ public class HistoryTest {
 
         taskManager.getAllSubtasks();
 
-        List<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistoryManager();
         assertEquals(11, history.size());
 
         taskManager.clearAllEpics();
-        history = taskManager.getHistory();
+        history = taskManager.getHistoryManager();
         assertEquals(0, history.size());
     }
 }

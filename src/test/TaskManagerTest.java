@@ -132,7 +132,7 @@ public class TaskManagerTest {
         accessed.setDescription("Modified Description");
         accessed.setTaskStatus(TaskStatus.DONE);
 
-        List<Task> history = manager.getHistory();
+        List<Task> history = manager.getHistoryManager();
 
         assertEquals(1, history.size(), "История должна содержать одну задачу");
 
