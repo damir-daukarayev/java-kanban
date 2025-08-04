@@ -267,8 +267,8 @@ public class InMemoryTaskManager implements TaskManager {
         countInProgress = subtaskIds.stream()
                 .map(mapOfSubtasks::get)
                 .filter(Objects::nonNull)
-                .filter(subTask -> subTask.getTaskStatus() == TaskStatus.IN_PROGRESS).
-                count();
+                .filter(subTask -> subTask.getTaskStatus() == TaskStatus.IN_PROGRESS)
+                .count();
 
         countDone = subtaskIds.stream()
                 .map(mapOfSubtasks::get)
