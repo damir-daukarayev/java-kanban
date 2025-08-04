@@ -8,7 +8,6 @@ import modelling.TaskStatus;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int id = 0;
@@ -254,28 +253,28 @@ public class InMemoryTaskManager implements TaskManager {
         long countInProgress = 0;
         long countDone = 0;
 
-        validSubtaskCount = subtaskIds.stream().
-                map(mapOfSubtasks::get).
-                filter(Objects::nonNull).
+        validSubtaskCount = subtaskIds.stream()
+                .map(mapOfSubtasks::get)
+                .filter(Objects::nonNull)
+                .count();
+
+        countNew = subtaskIds.stream()
+                .map(mapOfSubtasks::get)
+                .filter(Objects::nonNull)
+                .filter(subtask -> subtask.getTaskStatus() == TaskStatus.NEW)
+                .count();
+
+        countInProgress = subtaskIds.stream()
+                .map(mapOfSubtasks::get)
+                .filter(Objects::nonNull)
+                .filter(subTask -> subTask.getTaskStatus() == TaskStatus.IN_PROGRESS).
                 count();
 
-        countNew = subtaskIds.stream().
-                map(mapOfSubtasks::get).
-                filter(Objects::nonNull).
-                filter(subtask -> subtask.getTaskStatus() == TaskStatus.NEW).
-                count();
-
-        countInProgress = subtaskIds.stream().
-                map(mapOfSubtasks::get).
-                filter(Objects::nonNull).
-                filter(subTask -> subTask.getTaskStatus() == TaskStatus.IN_PROGRESS).
-                count();
-
-        countDone = subtaskIds.stream().
-                map(mapOfSubtasks::get).
-                filter(Objects::nonNull).
-                filter(subTask -> subTask.getTaskStatus() == TaskStatus.DONE).
-                count();
+        countDone = subtaskIds.stream()
+                .map(mapOfSubtasks::get)
+                .filter(Objects::nonNull)
+                .filter(subTask -> subTask.getTaskStatus() == TaskStatus.DONE)
+                .count();
 
         if (validSubtaskCount == 0) {
             mapOfEpics.get(epicId).setTaskStatus(TaskStatus.NEW);
@@ -494,13 +493,13 @@ public class InMemoryTaskManager implements TaskManager {
 //            }
 //        }
 
-        List<Task> tasksToCheck = prioritizedTasks.stream().
-                filter(existingTask -> existingTask.getStartTime() != null && existingTask.getDuration() != null).
-                filter(existingTask -> existingTask.getId() != newTaskId).
-                toList();
+        List<Task> tasksToCheck = prioritizedTasks.stream()
+                .filter(existingTask -> existingTask.getStartTime() != null && existingTask.getDuration() != null)
+                .filter(existingTask -> existingTask.getId() != newTaskId)
+                .toList();
 
-        return tasksToCheck.stream().
-                anyMatch(existingTask -> areTasksOverlapping(existingTask, newTask));
+        return tasksToCheck.stream()
+                .anyMatch(existingTask -> areTasksOverlapping(existingTask, newTask));
     }
 
     @Override
