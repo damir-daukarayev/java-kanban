@@ -1,5 +1,7 @@
 package modelling;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,17 +9,31 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus taskStatus;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.taskStatus = TaskStatus.NEW;
+        this.duration = Duration.ZERO;
+        this.startTime = null;
     }
 
     public Task(String name, String description, TaskStatus taskStatus) {
         this.name = name;
         this.description = description;
         this.taskStatus = taskStatus;
+        this.duration = Duration.ZERO;
+        this.startTime = null;
+    }
+
+    public Task(String name, String description, TaskStatus taskStatus, Duration duration, LocalDateTime startTime) {
+        this.name = name;
+        this.description = description;
+        this.taskStatus = taskStatus;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     public String getName() {
@@ -60,12 +76,34 @@ public class Task {
         return "Task";
     }
 
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public Duration getDuration() {
+        return this.duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getStartTime() {
+        return this.startTime;
+    }
+
     // Для правильного сохранения тасков в истории
     // таким образом удастся детально сохранять таск
     public Task copy() {
-        Task copy = new Task(this.name, this.description, this.taskStatus);
+        Task copy = new Task(this.name, this.description, this.taskStatus, this.duration, this.startTime);
         copy.setId(this.id);
         return copy;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (startTime == null) return null;
+
+        return this.startTime.plusMinutes(duration.toMinutes());
     }
 
     @Override
@@ -87,6 +125,9 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", taskStatus=" + taskStatus +
+                ", duration=" + (duration != null ? duration.toMinutes() : "null") + // Convert to minutes for display
+                ", startTime=" + startTime +
+                ", endTime=" + getEndTime() +
                 '}';
     }
 }

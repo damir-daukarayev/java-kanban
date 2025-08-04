@@ -1,5 +1,6 @@
 package test;
 
+import exceptions.ManagerSaveException;
 import manager.FileBackedTaskManager;
 import manager.InMemoryTaskManager;
 import modelling.Epic;
@@ -7,11 +8,13 @@ import modelling.Subtask;
 import modelling.Task;
 import modelling.TaskStatus;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -77,5 +80,32 @@ public class FileBackedTaskManagerTest {
         assertEquals(3, loadedManager.getAllTasks().size(), "Должно быть 3 таска");
         assertEquals(2, loadedManager.getAllEpics().size(), "Должно быть 2 эпика");
         assertEquals(3, loadedManager.getAllSubtasks().size(), "Должно быть 3 подзадачи");
+    }
+
+    @Test
+    void shouldThrowManagerSaveExceptionWhenFileWriteFails() throws IOException {
+        File nonExistentDir = new File("non_existent_dir_for_test/test_file.csv");
+        FileBackedTaskManager brokenManager = new FileBackedTaskManager(nonExistentDir);
+        brokenManager.createTask(new Task("Task to save", "Description"));
+
+        tempFile.setWritable(false);
+
+        Assertions.assertThrows(ManagerSaveException.class, () -> {
+            manager.save();
+        });
+
+        tempFile.setWritable(true);
+    }
+
+    @Test
+    void shouldThrowManagerSaveExceptionWhenFileReadFails() throws IOException {
+        Files.writeString(tempFile.toPath(), "Some test data");
+        tempFile.setReadable(false);
+
+        Assertions.assertThrows(ManagerSaveException.class, () -> {
+            FileBackedTaskManager.loadFromFile(tempFile);
+        });
+
+        tempFile.setReadable(true);
     }
 }

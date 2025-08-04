@@ -69,4 +69,6 @@ public interface TaskManager {
 
     //Получить историю тасков, к которым мы получали доступ
     List<Task> getHistoryManager();
+
+    List<Task> getPrioritizedTasks();
 }
