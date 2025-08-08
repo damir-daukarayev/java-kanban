@@ -5,27 +5,43 @@ import modelling.Subtask;
 import modelling.Task;
 import modelling.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class CSVFormatter {
     public static String getHeader() {
-        return "id,type,name,status,description,epic";
+        return "id,type,name,status,description,start_time, duration,epic";
     }
 
     //таск превращает в CSV строку
     public static String toCSVString(Task task) {
-        return  task.getId() + "," + task.getType() + "," + task.getName() + ","
-                + task.getTaskStatus() + "," + task.getDescription() + ",";
+        String startTimeStr = (task.getStartTime() != null) ? task.getStartTime().toString() : "null";
+        long durationMinutes = (task.getDuration() != null) ? task.getDuration().toMinutes() : 0;
+
+        return task.getId() + "," + task.getType() + "," + task.getName() + ","
+                + task.getTaskStatus() + "," + task.getDescription() + ","
+                + startTimeStr + "," + durationMinutes + ",";
     }
 
     //эпик превращает в CSV строку
     public static String toCSVString(Epic epic) {
-        return  epic.getId() + "," + epic.getType() + "," + epic.getName() + ","
-                + epic.getTaskStatus() + "," + epic.getDescription() + ",";
+        String startTimeStr = (epic.getStartTime() != null) ? epic.getStartTime().toString() : "null";
+        long durationMinutes = (epic.getDuration() != null) ? epic.getDuration().toMinutes() : 0;
+
+        return epic.getId() + "," + epic.getType() + "," + epic.getName() + ","
+                + epic.getTaskStatus() + "," + epic.getDescription() + ","
+                + startTimeStr + "," + durationMinutes + ",";
     }
 
     //сабтаск превращает в CSV строку
     public static String toCSVString(Subtask subtask) {
-        return  subtask.getId() + "," + subtask.getType() + "," + subtask.getName() + "," +
-                subtask.getTaskStatus() + "," + subtask.getDescription() + "," + subtask.getEpicId();
+        String startTimeStr = (subtask.getStartTime() != null) ? subtask.getStartTime().toString() : "null";
+        long durationMinutes = (subtask.getDuration() != null) ? subtask.getDuration().toMinutes() : 0;
+
+        return subtask.getId() + "," + subtask.getType() + "," + subtask.getName() + ","
+                + subtask.getTaskStatus() + "," + subtask.getDescription() + ","
+                + startTimeStr + "," + durationMinutes + ","
+                + subtask.getEpicId();
     }
 
     //CSV строку превращаем в таск
@@ -36,22 +52,25 @@ public class CSVFormatter {
         String name = parts[2];
         TaskStatus taskStatus = TaskStatus.valueOf(parts[3]);
         String description = parts[4];
+        LocalDateTime startTime = parts[5].equals("null") ? null : LocalDateTime.parse(parts[5]);
+        Duration duration = Duration.ofMinutes(Long.parseLong(parts[6]));
 
         if (type.equals("Subtask")) {
-            // Correctly retrieves epicId
-            int epicId = Integer.parseInt(parts[5]);
-            Subtask subtask = new Subtask(name, description, taskStatus, epicId);
-            subtask.setId(id); // Ensure the ID is set from the file
+            int epicId = Integer.parseInt(parts[7]);
+            Subtask subtask = new Subtask(name, description, taskStatus, epicId, duration, startTime);
+            subtask.setId(id);
             return subtask;
         } else if (type.equals("Epic")) {
             Epic epic = new Epic(name, description);
             epic.setTaskStatus(taskStatus);
-            epic.setId(id); // Ensure the ID is set from the file
+            epic.setId(id);
+            epic.setDuration(duration);
+            epic.setStartTime(startTime);
             return epic;
         }
 
         Task task = new Task(name, description, taskStatus);
-        task.setId(id); // Ensure the ID is set from the file
+        task.setId(id);
         return task;
     }
 }

@@ -62,11 +62,13 @@ public interface TaskManager {
     Subtask createSubtask(Subtask subtask);
 
     //Обновление
-    boolean updateSubtask(Subtask subtask);
+    boolean updateSubtask(Subtask oldSubtask, Subtask updatedSubtask);
 
     //Удаление по идентефикатору
     boolean deleteSubtask(int index);
 
     //Получить историю тасков, к которым мы получали доступ
     List<Task> getHistoryManager();
+
+    List<Task> getPrioritizedTasks();
 }
