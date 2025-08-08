@@ -57,13 +57,15 @@ public class CSVFormatter {
 
         if (type.equals("Subtask")) {
             int epicId = Integer.parseInt(parts[7]);
-            Subtask subtask = new Subtask(name, description, taskStatus, epicId);
+            Subtask subtask = new Subtask(name, description, taskStatus, epicId, duration, startTime);
             subtask.setId(id);
             return subtask;
         } else if (type.equals("Epic")) {
             Epic epic = new Epic(name, description);
             epic.setTaskStatus(taskStatus);
             epic.setId(id);
+            epic.setDuration(duration);
+            epic.setStartTime(startTime);
             return epic;
         }
 

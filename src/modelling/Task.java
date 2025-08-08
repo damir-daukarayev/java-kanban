@@ -126,8 +126,8 @@ public class Task {
                 ", id=" + id +
                 ", taskStatus=" + taskStatus +
                 ", duration=" + (duration != null ? duration.toMinutes() : "null") + // Convert to minutes for display
-                ", startTime=" + startTime +
-                ", endTime=" + getEndTime() +
+                ", startTime=" + (startTime != null ? startTime : "null") +
+                ", endTime=" + (getEndTime() != null ? getEndTime() : "null") +
                 '}';
     }
 }

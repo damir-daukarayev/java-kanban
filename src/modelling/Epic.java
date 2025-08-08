@@ -10,7 +10,6 @@ public class Epic extends Task {
 
     public Epic(String name, String description) {
         super(name, description, TaskStatus.NEW);
-        this.duration = Duration.ZERO;
         this.startTime = null;
         this.endTime = null;
     }
@@ -25,16 +24,6 @@ public class Epic extends Task {
 
     public void removeSubtaskId(int id) {
         subtaskIds.remove(Integer.valueOf(id));
-    }
-
-    @Override
-    public void setDuration(Duration duration) {
-        this.duration = duration;
-    }
-
-    @Override
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
     }
 
     public void setEndTime(LocalDateTime endTime) {

@@ -86,8 +86,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public boolean updateSubtask(Subtask subtask) {
-        boolean updated = super.updateSubtask(subtask);
+    public boolean updateSubtask(Subtask oldSubtask, Subtask updatedSubtask) {
+        boolean updated = super.updateSubtask(oldSubtask, updatedSubtask);
         save();
         return updated;
     }
@@ -156,33 +156,31 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             switch (task.getType()) {
                 case "Task":
-                    taskManager.addLoadedTask(task); // Use addLoadedTask to also add to prioritizedTasks
+                    taskManager.addLoadedTask(task);
                     break;
                 case "Epic":
                     taskManager.addLoadedEpic((Epic) task);
+                    break;
+                case "Subtask":
+                    taskManager.addLoadedSubtask((Subtask) task);
                     break;
                 // Subtasks handled in the second pass after epics are loaded
             }
         }
 
-        for (String line : taskLines) {
-            Task task = CSVFormatter.fromString(line); // Parse again
-            if (task.getType().equals("Subtask")) {
-                Subtask subtask = (Subtask) task;
-                Epic parentEpic = taskManager.mapOfEpics.get(subtask.getEpicId());
-                if (parentEpic != null) {
-                    // Ensure the subtask is added to the InMemoryTaskManager via its methods
-                    // to correctly update prioritizedTasks and epic calculations.
-                    // Re-create the subtask using manager's method to ensure proper setup
-                    // (though for loading, directly adding to map is fine if calculations are explicit).
-                    // For simplicity and to reuse logic, let's call addLoadedSubtask
-                    taskManager.addLoadedSubtask(subtask);
-                    parentEpic.addSubtaskId(subtask.getId()); // Ensure epic has subtask ID
-                } else {
-                    System.err.println("Ошибка: Subtask " + task.getId() + " относится к несуществующему эпику " + subtask.getEpicId());
-                }
-            }
-        }
+//        for (String line : taskLines) {
+//            Task task = CSVFormatter.fromString(line);
+//            if (task.getType().equals("Subtask")) {
+//                Subtask subtask = (Subtask) task;
+//                Epic parentEpic = taskManager.mapOfEpics.get(subtask.getEpicId());
+//                if (parentEpic != null) {
+//                    taskManager.addLoadedSubtask(subtask);
+//                    parentEpic.addSubtaskId(subtask.getId()); // Ensure epic has subtask ID
+//                } else {
+//                    System.err.println("Ошибка: Subtask " + task.getId() + " относится к несуществующему эпику " + subtask.getEpicId());
+//                }
+//            }
+//        }
 
         for (Epic epic : taskManager.mapOfEpics.values()) {
             taskManager.calculateEpicStatus(epic.getId());
