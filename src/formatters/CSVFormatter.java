@@ -71,6 +71,8 @@ public class CSVFormatter {
 
         Task task = new Task(name, description, taskStatus);
         task.setId(id);
+        task.setDuration(duration);
+        task.setStartTime(startTime);
         return task;
     }
 }

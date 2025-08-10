@@ -164,30 +164,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 case "Subtask":
                     taskManager.addLoadedSubtask((Subtask) task);
                     break;
-                // Subtasks handled in the second pass after epics are loaded
             }
         }
-
-//        for (String line : taskLines) {
-//            Task task = CSVFormatter.fromString(line);
-//            if (task.getType().equals("Subtask")) {
-//                Subtask subtask = (Subtask) task;
-//                Epic parentEpic = taskManager.mapOfEpics.get(subtask.getEpicId());
-//                if (parentEpic != null) {
-//                    taskManager.addLoadedSubtask(subtask);
-//                    parentEpic.addSubtaskId(subtask.getId()); // Ensure epic has subtask ID
-//                } else {
-//                    System.err.println("Ошибка: Subtask " + task.getId() + " относится к несуществующему эпику " + subtask.getEpicId());
-//                }
-//            }
-//        }
 
         for (Epic epic : taskManager.mapOfEpics.values()) {
             taskManager.calculateEpicStatus(epic.getId());
             taskManager.calculateEpicTime(epic.getId());
         }
 
-        taskManager.setId(maxId + 1); // Set the next available ID
+        taskManager.setId(maxId + 1);
 
         return taskManager;
     }

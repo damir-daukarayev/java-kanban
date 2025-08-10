@@ -19,7 +19,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
-    // And possibly a method to directly add a task with its ID
     public void addLoadedTask(Task task) {
         mapOfTasks.put(task.getId(), task);
         addPrioritizedTask(task);
@@ -57,9 +56,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void clearAllTasks() {
 //         Удалить все из истории при массовом удалении задач
-//        for (Map.Entry<Integer, Task> e : mapOfTasks.entrySet()) {
-//            historyManager.remove(e.getKey());
-//        }
 
         mapOfTasks.values().stream().forEach(prioritizedTasks::remove);
         mapOfTasks.keySet().stream().forEach(historyManager::remove);
@@ -105,8 +101,8 @@ public class InMemoryTaskManager implements TaskManager {
             return false;
         }
 
-        mapOfTasks.put(id, updatedTask);
         updatePrioritizedTask(mapOfTasks.get(id), updatedTask);
+        mapOfTasks.put(id, updatedTask);
         return true;
     }
 
@@ -133,10 +129,6 @@ public class InMemoryTaskManager implements TaskManager {
             return new ArrayList<>();
         }
 
-//        for (Map.Entry<Integer, Epic> e : mapOfEpics.entrySet()) {
-//            historyManager.add(e.getValue());
-//        }
-
         mapOfEpics.values().stream().forEach(historyManager::add);
 
         return new ArrayList<>(mapOfEpics.values());
@@ -147,16 +139,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void clearAllEpics() {
         // Удалить все из истории при массовом удалении задач
-//        for (Map.Entry<Integer, Subtask> e : mapOfSubtasks.entrySet()) {
-//            historyManager.remove(e.getKey());
-//        }
 
         mapOfSubtasks.keySet().stream().forEach(historyManager::remove);
         mapOfSubtasks.values().stream().forEach(prioritizedTasks::remove);
-
-//        for (Map.Entry<Integer, Epic> e : mapOfEpics.entrySet()) {
-//            historyManager.remove(e.getKey());
-//        }
 
         mapOfEpics.keySet().stream().forEach(historyManager::remove);
         mapOfEpics.values().stream().forEach(prioritizedTasks::remove);
@@ -181,6 +166,7 @@ public class InMemoryTaskManager implements TaskManager {
         //в соответсвии с переделанным setId
         epic.setId(generateId());
         mapOfEpics.put(epic.getId(), epic);
+        addPrioritizedTask(epic);
         System.out.println("Epic[" + epic.getId() + "] created");
         return epic;
     }
@@ -188,10 +174,11 @@ public class InMemoryTaskManager implements TaskManager {
     //Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     @Override
     public boolean updateEpic(int epicId, String name, String description) {
+        Epic oldEpic = mapOfEpics.get(epicId);
         if (mapOfEpics.containsKey(epicId)) {
-            //first delete the subtasks of the epic and the epic itself
             mapOfEpics.get(epicId).setName(name);
             mapOfEpics.get(epicId).setDescription(description);
+            updatePrioritizedTask(oldEpic, mapOfEpics.get(epicId));
             return true;
         } else {
             System.out.println("There is no such Epic with such id.");
@@ -203,7 +190,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public boolean updateEpic(Epic epic) {
         if (mapOfEpics.containsKey(epic.getId())) {
-            //first delete the subtasks of the epic and the epic itself
             mapOfEpics.get(epic.getId()).setName(epic.getName());
             mapOfEpics.get(epic.getId()).setDescription(epic.getName());
             return true;
@@ -343,10 +329,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         prioritizedTasks.removeIf(task -> task.getType().equals("Subtask"));
-        // Удалить все из истории при массовом удалении задач
-//        for (Map.Entry<Integer, Subtask> e : mapOfSubtasks.entrySet()) {
-//            historyManager.remove(e.getKey());
-//        }
 
         mapOfSubtasks.keySet().stream().forEach(historyManager::remove);
 
@@ -371,10 +353,6 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("=".repeat(50));
             return new ArrayList<>();
         }
-
-//        for (Map.Entry<Integer, Subtask> e : mapOfSubtasks.entrySet()) {
-//            historyManager.add(e.getValue());
-//        }
 
         mapOfSubtasks.values().stream().forEach(historyManager::add);
 
@@ -420,8 +398,8 @@ public class InMemoryTaskManager implements TaskManager {
             return false;
         }
 
-        mapOfSubtasks.put(oldSubtask.getId(), updatedSubtask);
         updatePrioritizedTask(oldSubtask, updatedSubtask);
+        mapOfSubtasks.put(oldSubtask.getId(), updatedSubtask);
         calculateEpicStatus(updatedSubtask.getEpicId());
         calculateEpicTime(updatedSubtask.getEpicId());
         return true;
@@ -462,7 +440,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.remove(oldTask);
             prioritizedTasks.add(task);
         } else {
-            prioritizedTasks.remove(task);
+            prioritizedTasks.remove(oldTask);
         }
     }
 
