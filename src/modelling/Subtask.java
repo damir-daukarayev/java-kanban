@@ -1,5 +1,8 @@
 package modelling;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     protected int epicId;
 
@@ -8,10 +11,21 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
+    public Subtask(String name,
+                   String description,
+                   TaskStatus taskStatus,
+                   int epicId,
+                   Duration duration,
+                   LocalDateTime startTime) {
+        super(name, description, taskStatus, duration, startTime);
+        this.epicId = epicId;
+    }
+
     //  Для детального сохранения Сабтасков
     @Override
     public Task copy() {
-        Subtask copy = new Subtask(this.name, this.description, this.taskStatus, this.epicId);
+        Subtask copy = new Subtask(this.name, this.description, this.taskStatus, this.epicId,
+                this.duration, this.startTime);
         copy.setId(this.id);
         return copy;
     }
@@ -49,6 +63,10 @@ public class Subtask extends Task {
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", taskStatus=" + taskStatus +
+                ", duration=" + (duration != null ? duration.toMinutes() : "null") +
+                ", startTime=" + startTime +
+                ", endTime=" + getEndTime() +
+                ", epicId=" + epicId +
                 '}';
     }
 }

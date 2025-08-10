@@ -5,6 +5,9 @@ import modelling.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -151,5 +154,77 @@ public class TaskManagerTest {
         assertEquals(original.getName(), added.getName());
         assertEquals(original.getDescription(), added.getDescription());
         assertEquals(original.getTaskStatus(), added.getTaskStatus());
+    }
+
+    @Test
+    void shouldReturnEpicStatusNewForAllSubtasksWithStatusNew() {
+        Epic epic = manager.createEpic(new Epic("Epic1", "Description1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "Description1", TaskStatus.NEW, epic.getId()));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "Description2", TaskStatus.NEW, epic.getId()));
+        Subtask subtask3 = manager.createSubtask(new Subtask("Subtask3", "Description3", TaskStatus.NEW, epic.getId()));
+        assertEquals(TaskStatus.NEW, epic.getTaskStatus());
+    }
+
+    @Test
+    void shouldReturnEpicStatusDoneForAllSubtasksWithStatusDone() {
+        Epic epic = manager.createEpic(new Epic("Epic1", "Description1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "Description1", TaskStatus.DONE, epic.getId()));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "Description2", TaskStatus.DONE, epic.getId()));
+        Subtask subtask3 = manager.createSubtask(new Subtask("Subtask3", "Description3", TaskStatus.DONE, epic.getId()));
+        assertEquals(TaskStatus.DONE, epic.getTaskStatus());
+    }
+
+    @Test
+    void shouldReturnEpicStatusInProgressForAllSubtasksWithStatusMixed() {
+        Epic epic = manager.createEpic(new Epic("Epic1", "Description1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "Description1", TaskStatus.NEW, epic.getId()));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "Description2", TaskStatus.DONE, epic.getId()));
+        Subtask subtask3 = manager.createSubtask(new Subtask("Subtask3", "Description3", TaskStatus.NEW, epic.getId()));
+        assertEquals(TaskStatus.IN_PROGRESS, epic.getTaskStatus());
+    }
+
+    @Test
+    void shouldReturnEpicStatusInProgressForAllSubtasksWithStatusInProgress() {
+        Epic epic = manager.createEpic(new Epic("Epic1", "Description1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "Description1",
+                TaskStatus.IN_PROGRESS, epic.getId()));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "Description2",
+                TaskStatus.IN_PROGRESS, epic.getId()));
+        Subtask subtask3 = manager.createSubtask(new Subtask("Subtask3", "Description3",
+                TaskStatus.IN_PROGRESS, epic.getId()));
+        assertEquals(TaskStatus.IN_PROGRESS, epic.getTaskStatus());
+    }
+
+    @Test
+    void shouldReturn11_50AsEndTime() {
+        Epic epic1 = manager.createEpic(new Epic("Epic1", "Description1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "Description1",
+                TaskStatus.IN_PROGRESS, epic1.getId(), Duration.ofMinutes(20),
+                LocalDateTime.of(2025, Month.JULY, 31, 11, 30)));
+        assertEquals(epic1.getStartTime().plusMinutes(epic1.getDuration().toMinutes()), epic1.getEndTime());
+    }
+
+    @Test
+    void shouldReturnTotalDurationOf40Minutes() {
+        Epic epic1 = manager.createEpic(new Epic("Epic1", "Description1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "Description1",
+                TaskStatus.IN_PROGRESS, epic1.getId(), Duration.ofMinutes(20),
+                LocalDateTime.of(2025, Month.JULY, 31, 11, 30)));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "Description2",
+                TaskStatus.IN_PROGRESS, epic1.getId(), Duration.ofMinutes(20),
+                LocalDateTime.of(2025, Month.JULY, 31, 12, 0)));
+        assertEquals(Duration.ofMinutes(40), epic1.getDuration());
+    }
+
+    @Test
+    void shouldCatchOverlappingTasks() {
+        Epic epic1 = manager.createEpic(new Epic("Epic1", "Description1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "Description1",
+                TaskStatus.IN_PROGRESS, epic1.getId(), Duration.ofMinutes(30),
+                LocalDateTime.of(2025, Month.JULY, 31, 11, 30)));
+
+        assertEquals(null, manager.createSubtask(new Subtask("Subtask2", "Description2",
+                TaskStatus.IN_PROGRESS, epic1.getId(), Duration.ofMinutes(20),
+                LocalDateTime.of(2025, Month.JULY, 31, 11, 50))));
     }
 }
